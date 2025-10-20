@@ -142,7 +142,7 @@ export default function AddCateringProduct() {
         className="space-y-4 w-full grid grid-cols-1 md:grid-cols-2 gap-4"
       >
         {/* Name */}
-        <div>
+        <div className="col-span-2 w-full">
           <label
             htmlFor="name"
             className="block text-gray-700 font-semibold mb-1"
@@ -223,7 +223,7 @@ export default function AddCateringProduct() {
         </div>
 
         {/* Price */}
-        <div>
+        <div className="w-full col-span-2">
           <label
             htmlFor="price"
             className="block text-gray-700 font-semibold mb-1"
@@ -243,7 +243,7 @@ export default function AddCateringProduct() {
         </div>
 
         {/* Original Price (optional) */}
-        <div>
+        <div className="w-full col-span-2">
           <label
             htmlFor="originalPrice"
             className="block text-gray-700 font-semibold mb-1"
@@ -263,7 +263,7 @@ export default function AddCateringProduct() {
         </div>
 
         {/* Discounted Price (optional) */}
-        <div>
+        <div className="w-full">
           <label
             htmlFor="discountedPrice"
             className="block text-gray-700 font-semibold mb-1"

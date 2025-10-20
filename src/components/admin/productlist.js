@@ -249,7 +249,11 @@ export default function ProductList() {
                     <>
                       <td className="px-4 py-2 capitalize">{product.type}</td>
                       <td className="px-4 py-2">{product.name}</td>
-                      <td className="px-4 py-2">{product.description}</td>
+                      <td className="px-4 py-2">
+                        {product.description.length > 100
+                          ? product.description.slice(0, 100) + "..."
+                          : product.description}
+                      </td>
                       <td className="px-4 py-2">
                         {product.sizes ? product.sizes.join(", ") : "N/A"}
                       </td>

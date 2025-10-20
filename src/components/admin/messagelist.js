@@ -85,7 +85,7 @@ export default function MessagesList() {
   }
 
   return (
-    <div className="px-4 max-w-4xl mx-auto">
+    <div className="px-4 w-full mx-auto">
       <h1 className="text-4xl font-bold text-gray-800 mb-8 text-center">
         Contact Messages
       </h1>

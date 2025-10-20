@@ -147,7 +147,7 @@ export default function Header() {
             AJEBORUSH
           </Link>
 
-          <nav className="flex items-center space-x-2">
+          <nav className="flex items-center space-x-1">
             {navItems.map((item) => renderNavItem(item, false))}
           </nav>
         </div>

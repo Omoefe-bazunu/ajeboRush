@@ -133,7 +133,7 @@ export default function AddFashionProduct() {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="w-full mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
         Add New Fashion Product
       </h2>
@@ -142,7 +142,7 @@ export default function AddFashionProduct() {
         className="space-y-4 grid grid-cols-2 gap-4"
       >
         {/* Name */}
-        <div>
+        <div className="col-span-2 w-full">
           <label
             htmlFor="name"
             className="block text-gray-700 font-semibold mb-1"
@@ -223,7 +223,7 @@ export default function AddFashionProduct() {
         </div>
 
         {/* Sizes */}
-        <div>
+        <div className="col-span-2 w-full">
           <label
             htmlFor="sizes"
             className="block text-gray-700 font-semibold mb-1"
@@ -245,7 +245,7 @@ export default function AddFashionProduct() {
         </div>
 
         {/* Price */}
-        <div>
+        <div className="col-span-2 w-full">
           <label
             htmlFor="price"
             className="block text-gray-700 font-semibold mb-1"
@@ -265,7 +265,7 @@ export default function AddFashionProduct() {
         </div>
 
         {/* Original Price (optional) */}
-        <div>
+        <div className="col-span-2 w-full">
           <label
             htmlFor="originalPrice"
             className="block text-gray-700 font-semibold mb-1"
@@ -285,7 +285,7 @@ export default function AddFashionProduct() {
         </div>
 
         {/* Discounted Price (optional) */}
-        <div>
+        <div className="col-span-2 w-full">
           <label
             htmlFor="discountedPrice"
             className="block text-gray-700 font-semibold mb-1"

@@ -14,6 +14,8 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebaseConfig";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Undo } from "lucide-react";
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -314,10 +316,11 @@ export default function CheckoutPage() {
       )}
 
       {cart.length > 0 && (
-        <div className="text-center mt-10">
-          <Button href="/cart" className="bg-gray-700 hover:bg-gray-800">
-            Back to Cart
-          </Button>
+        <div className="text-center mt-10 hover:text-orange-600 transition-colors">
+          <Link href="/cart">
+            <Undo className="text-center mx-auto" />
+            <p className="text-xl font-semibold">Back to Cart</p>
+          </Link>
         </div>
       )}
     </div>
