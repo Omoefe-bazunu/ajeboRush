@@ -15,7 +15,13 @@ import {
 import { db } from "@/lib/firebaseConfig";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Undo } from "lucide-react";
+import {
+  Undo,
+  ShieldCheck,
+  Truck,
+  MessageCircle,
+  CreditCard,
+} from "lucide-react";
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -33,14 +39,12 @@ export default function CheckoutPage() {
   const [cartLoading, setCartLoading] = useState(true);
   const router = useRouter();
 
-  // Track authentication and fetch cart
   useEffect(() => {
-    if (!user) {
+    if (user === null) {
       router.push("/login");
       return;
     }
 
-    // Fetch cart from correct subcollection path: /users/{userId}/cart/{cartItemId}
     const fetchCart = async () => {
       try {
         const cartRef = collection(db, "users", user.uid, "cart");
@@ -58,7 +62,7 @@ export default function CheckoutPage() {
       }
     };
 
-    fetchCart();
+    if (user) fetchCart();
   }, [user, router]);
 
   const totalPrice = cart.reduce((total, item) => {
@@ -73,13 +77,13 @@ export default function CheckoutPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name) newErrors.name = "Name is required";
+    if (!formData.name) newErrors.name = "Full name is required";
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email is invalid";
     }
-    if (!formData.address) newErrors.address = "Address is required";
+    if (!formData.address) newErrors.address = "Shipping address is required";
     if (!formData.city) newErrors.city = "City is required";
     if (!formData.state) newErrors.state = "State is required";
     if (!formData.zip) newErrors.zip = "ZIP code is required";
@@ -88,19 +92,14 @@ export default function CheckoutPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // 🔧 NEW: Clear cart after successful order
   const clearCartFromFirestore = async () => {
     if (!user) return;
-
     try {
       const cartRef = collection(db, "users", user.uid, "cart");
       const snapshot = await getDocs(cartRef);
-
-      // Delete each cart item
       for (const cartDoc of snapshot.docs) {
         await deleteDoc(doc(db, "users", user.uid, "cart", cartDoc.id));
       }
-
       setCart([]);
     } catch (error) {
       console.error("Error clearing cart:", error);
@@ -110,13 +109,12 @@ export default function CheckoutPage() {
   const handleWhatsAppOrder = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    if (!user) return alert("Please log in before placing your order.");
-    if (cart.length === 0) return alert("Your cart is empty!");
+    if (!user) return alert("Security session expired. Please log in.");
+    if (cart.length === 0) return alert("Your cart is currently empty.");
 
     setLoading(true);
 
     try {
-      // Prepare order data
       const orderData = {
         userId: user.uid,
         userEmail: formData.email,
@@ -138,191 +136,270 @@ export default function CheckoutPage() {
         createdAt: serverTimestamp(),
       };
 
-      // Save to /orders/{orderId}
       await addDoc(collection(db, "orders"), orderData);
-
-      // 🔧 NEW: Clear cart after successful order creation
       await clearCartFromFirestore();
 
-      // Build WhatsApp message
       const orderDetails = cart
         .map(
           (item, index) =>
-            `${index + 1}. ${item.name} ${
+            `${index + 1}. *${item.name}* ${
               item.selectedSize ? `(Size: ${item.selectedSize})` : ""
-            } - ${item.quantity} x $${item.discountedPrice || item.price}`
+            } - ${item.quantity} unit(s) @ $${
+              item.discountedPrice || item.price
+            }`
         )
         .join("%0A");
 
-      const shippingInfo = `Name: ${formData.name}%0AEmail: ${
-        formData.email
-      }%0AAddress: ${formData.address}, ${formData.city}, ${formData.state}, ${
+      const shippingInfo = `*NEW STUDIO ORDER*%0A%0A*Client Details:*%0AName: ${
+        formData.name
+      }%0AEmail: ${formData.email}%0AAddress: ${formData.address}, ${
+        formData.city
+      }, ${formData.state} ${
         formData.zip
-      }%0A%0AOrder Total: $${totalPrice.toFixed(
+      }%0A%0A*Order Total:* $${totalPrice.toFixed(
         2
-      )}%0A%0AOrder Details:%0A${orderDetails}`;
+      )}%0A%0A*Manifest:*%0A${orderDetails}%0A%0A_Secured via AjeboRush Checkout_`;
 
       const whatsappNumber = "18172989961";
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${shippingInfo}`;
 
       window.open(whatsappUrl, "_blank");
-
-      alert("Order placed successfully! Your cart has been cleared.");
-      router.push("/");
+      router.push("/orders");
     } catch (error) {
-      console.error("Error saving order:", error);
-      alert("There was an error placing your order. Please try again.");
+      alert("Order transmission failed. Please check your connection.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (cartLoading) {
+  if (cartLoading)
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-700 text-lg">Loading checkout...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="w-10 h-10 border-4 border-rush border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="font-display font-black uppercase tracking-widest text-[10px] text-fashion/20">
+          Preparing Checkout Studio...
+        </p>
       </div>
     );
-  }
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-700 text-lg">Redirecting to login...</p>
-      </div>
-    );
-  }
 
   return (
-    <div className="py-16 px-6 md:px-12 max-w-6xl mx-auto">
-      <h1 className="text-4xl md:text-5xl font-extrabold text-orange-600 mb-10 mt-20 text-center">
-        Checkout
-      </h1>
+    <main className="min-h-screen bg-white pt-32 pb-24 md:pt-44 px-6">
+      <div className="max-w-7xl mx-auto">
+        {/* EDITORIAL HEADER */}
+        <header className="mb-16">
+          <span className="font-display text-rush font-bold uppercase tracking-[0.3em] text-[10px] mb-2 block">
+            Final Step
+          </span>
+          <h1 className="font-display text-5xl md:text-8xl font-black text-fashion uppercase tracking-tighter leading-none">
+            Secure <span className="text-rush italic">Checkout</span>
+          </h1>
+        </header>
 
-      {cart.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg shadow-sm">
-          <p className="text-gray-600 mb-6 text-lg">
-            Your cart is empty. Add some items to get started!
-          </p>
-          <Button href="/" className="bg-sky-800 hover:bg-sky-900">
-            Continue Shopping
-          </Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Shipping Form */}
-          <div className="bg-white p-6 rounded-2xl shadow-md">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              Shipping Details
-            </h2>
-            <form onSubmit={handleWhatsAppOrder} className="space-y-5">
-              {[
-                { name: "name", label: "Full Name", placeholder: "John Doe" },
-                {
-                  name: "email",
-                  label: "Email",
-                  placeholder: "you@example.com",
-                },
-                {
-                  name: "address",
-                  label: "Address",
-                  placeholder: "123 Main St",
-                },
-                { name: "city", label: "City", placeholder: "Los Angeles" },
-                { name: "state", label: "State", placeholder: "California" },
-                { name: "zip", label: "ZIP Code", placeholder: "90001" },
-              ].map((field) => (
-                <div key={field.name}>
-                  <label
-                    htmlFor={field.name}
-                    className="block text-gray-700 font-medium mb-1"
-                  >
-                    {field.label}
-                  </label>
-                  <input
-                    type="text"
-                    id={field.name}
-                    name={field.name}
-                    value={formData[field.name]}
-                    onChange={handleChange}
-                    placeholder={field.placeholder}
-                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-700 transition-all"
-                  />
-                  {errors[field.name] && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors[field.name]}
-                    </p>
-                  )}
-                </div>
-              ))}
-
-              <div className="text-center pt-4">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`px-8 py-3 rounded-xl text-white font-medium transition-all ${
-                    loading
-                      ? "bg-gray-500 cursor-not-allowed"
-                      : "bg-sky-800 hover:bg-sky-900"
-                  }`}
-                >
-                  {loading ? "Submitting..." : "Place Order via WhatsApp"}
-                </button>
-              </div>
-            </form>
+        {cart.length === 0 ? (
+          <div className="text-center py-20 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-100">
+            <p className="font-display text-2xl font-bold text-fashion/40 uppercase tracking-tighter mb-8">
+              Your manifest is empty
+            </p>
+            <Button
+              href="/"
+              className="bg-fashion text-white px-12 py-4 rounded-full font-display font-bold uppercase tracking-widest"
+            >
+              Start Exploring
+            </Button>
           </div>
-
-          {/* Order Summary */}
-          <div className="bg-gray-50 p-6 rounded-2xl shadow-inner">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              Order Summary
-            </h2>
-            <div className="space-y-5">
-              {cart.map((item) => (
-                <div
-                  key={`${item.id}-${item.selectedSize}`}
-                  className="flex items-center gap-4"
-                >
-                  <div className="relative w-20 h-20 flex-shrink-0">
-                    <Image
-                      src={item.imageURL}
-                      alt={item.name}
-                      fill
-                      sizes="(max-width: 768px) 80px, 80px"
-                      className="object-cover rounded-xl"
-                    />
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            {/* SHIPPING DOSSIER */}
+            <div className="lg:col-span-7">
+              <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm">
+                <div className="flex items-center gap-3 mb-10">
+                  <div className="p-2 bg-rush/10 rounded-xl">
+                    <Truck className="w-5 h-5 text-rush" />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-gray-900 font-semibold">{item.name}</h3>
-                    {item.selectedSize && (
-                      <p className="text-gray-600 text-sm">
-                        Size: {item.selectedSize}
-                      </p>
-                    )}
-                    <p className="text-gray-700 font-medium">
-                      ${item.discountedPrice || item.price} × {item.quantity}
-                    </p>
-                  </div>
+                  <h2 className="font-display text-2xl font-black text-fashion uppercase tracking-tighter">
+                    Shipping Details
+                  </h2>
                 </div>
-              ))}
 
-              <div className="border-t pt-4 flex justify-between text-lg font-semibold text-gray-900">
-                <span>Total</span>
-                <span>${totalPrice.toFixed(2)}</span>
+                <form
+                  onSubmit={handleWhatsAppOrder}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                >
+                  {[
+                    {
+                      name: "name",
+                      label: "Full Name",
+                      placeholder: "e.g. Ebuka Davies",
+                      col: "md:col-span-2",
+                    },
+                    {
+                      name: "email",
+                      label: "Email Link",
+                      placeholder: "name@example.com",
+                      col: "md:col-span-2",
+                    },
+                    {
+                      name: "address",
+                      label: "Logistics Address",
+                      placeholder: "Street address, Apt, Suite",
+                      col: "md:col-span-2",
+                    },
+                    { name: "city", label: "City", placeholder: "Dallas" },
+                    { name: "state", label: "State", placeholder: "TX" },
+                    { name: "zip", label: "ZIP Code", placeholder: "75001" },
+                  ].map((field) => (
+                    <div key={field.name} className={field.col || ""}>
+                      <label className="font-display font-black uppercase tracking-widest text-[10px] text-fashion/40 mb-2 block px-1">
+                        {field.label}
+                      </label>
+                      <input
+                        type="text"
+                        name={field.name}
+                        value={formData[field.name]}
+                        onChange={handleChange}
+                        placeholder={field.placeholder}
+                        className="w-full bg-gray-50 border-2 border-transparent focus:border-rush focus:bg-white rounded-2xl p-4 font-sans text-fashion outline-none transition-all shadow-inner"
+                      />
+                      {errors[field.name] && (
+                        <p className="text-rush text-[10px] font-bold uppercase mt-2 px-1 tracking-wider italic">
+                          {errors[field.name]}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+
+                  <div className="md:col-span-2 pt-8">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full group flex items-center justify-center gap-4 bg-rush text-white py-6 rounded-full font-display font-black uppercase tracking-[0.2em] text-sm hover:bg-fashion transition-all shadow-xl shadow-rush/20 disabled:opacity-50"
+                    >
+                      {loading ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                          Finalize via WhatsApp
+                        </>
+                      )}
+                    </button>
+                    <div className="flex items-center justify-center gap-4 mt-6">
+                      <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-fashion/30">
+                        <ShieldCheck className="w-3 h-3 text-green-500" />{" "}
+                        Secure Protocol
+                      </div>
+                      <div className="h-1 w-1 bg-gray-200 rounded-full" />
+                      <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-fashion/30">
+                        <CreditCard className="w-3 h-3 text-rush" /> Instant
+                        Concierge
+                      </div>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      {cart.length > 0 && (
-        <div className="text-center mt-10 hover:text-orange-600 transition-colors">
-          <Link href="/cart">
-            <Undo className="text-center mx-auto" />
-            <p className="text-xl font-semibold">Back to Cart</p>
-          </Link>
-        </div>
-      )}
-    </div>
+            {/* ORDER MANIFEST SIDEBAR */}
+            <aside className="lg:col-span-5">
+              <div className="bg-fashion p-10 rounded-[3rem] text-white shadow-2xl lg:sticky lg:top-44 overflow-hidden relative">
+                <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+                  <ShoppingBagIcon className="w-48 h-48" />
+                </div>
+
+                <h2 className="font-display text-3xl font-black uppercase tracking-tighter mb-10 border-b border-white/10 pb-6">
+                  Manifest Summary
+                </h2>
+
+                <div className="space-y-6 mb-12">
+                  {cart.map((item) => (
+                    <div
+                      key={`${item.id}-${item.selectedSize}`}
+                      className="flex items-center gap-5 group"
+                    >
+                      <div className="relative w-16 h-16 shrink-0 bg-white/5 rounded-xl overflow-hidden border border-white/10">
+                        <Image
+                          src={item.imageURL}
+                          alt={item.name}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display font-black text-xs uppercase tracking-tight truncate">
+                          {item.name}
+                        </p>
+                        {item.selectedSize && (
+                          <p className="text-[10px] font-sans font-bold text-rush uppercase tracking-widest mt-1">
+                            Size: {item.selectedSize}
+                          </p>
+                        )}
+                        <p className="text-white/40 font-sans text-xs mt-1">
+                          {item.quantity} x $
+                          {(item.discountedPrice || item.price).toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-display font-black text-sm">
+                          $
+                          {(
+                            (item.discountedPrice || item.price) * item.quantity
+                          ).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-4 pt-10 border-t border-white/10 relative z-10">
+                  <div className="flex justify-between font-sans text-xs text-white/40 uppercase tracking-[0.2em]">
+                    <span>Studio Subtotal</span>
+                    <span>${totalPrice.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-sans text-xs text-white/40 uppercase tracking-[0.2em]">
+                    <span>Logistics</span>
+                    <span className="text-rush font-bold">Complimentary</span>
+                  </div>
+                  <div className="pt-6 flex justify-between items-end">
+                    <span className="font-display font-black uppercase text-xs tracking-widest">
+                      Settlement Total
+                    </span>
+                    <span className="font-display text-5xl font-black leading-none">
+                      ${totalPrice.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+
+                <Link
+                  href="/cart"
+                  className="mt-12 flex items-center justify-center gap-2 text-[10px] font-display font-black uppercase tracking-[0.3em] text-white/20 hover:text-white transition-colors"
+                >
+                  <Undo className="w-3 h-3" /> Edit Manifest
+                </Link>
+              </div>
+            </aside>
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+// Minimal ShoppingBag Icon for background
+function ShoppingBagIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16 11V7a4 4 0 10-8 0v4M5 9h14l1 12H4L5 9z"
+      />
+    </svg>
   );
 }
