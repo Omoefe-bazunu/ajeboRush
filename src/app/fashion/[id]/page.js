@@ -6,9 +6,9 @@ import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
 import { Undo, Ruler, ShieldCheck, Truck } from "lucide-react";
 
-// ✅ Dynamic SEO Metadata optimized for ART WEAR
+// ✅ Updated to async params for Next.js 15
 export async function generateMetadata({ params }) {
-  const { id } = params;
+  const { id } = await params; // Await params here
   try {
     const docRef = doc(db, "fashion", id);
     const docSnap = await getDoc(docRef);
@@ -23,8 +23,9 @@ export async function generateMetadata({ params }) {
   }
 }
 
+// ✅ Updated to async params for Next.js 15
 export default async function FashionItemPage({ params }) {
-  const { id } = params;
+  const { id } = await params; // Await params here
 
   try {
     const docRef = doc(db, "fashion", id);

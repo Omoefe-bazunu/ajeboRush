@@ -6,9 +6,9 @@ import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
 import { Undo, Clock, MapPin, Sparkles } from "lucide-react";
 
-// ✅ Dynamic Metadata for SEO
+// ✅ Updated to async params for Next.js 15
 export async function generateMetadata({ params }) {
-  const { id } = params;
+  const { id } = await params; // Await params here
   try {
     const docRef = doc(db, "catering", id);
     const docSnap = await getDoc(docRef);
@@ -23,9 +23,9 @@ export async function generateMetadata({ params }) {
   }
 }
 
-// ✅ Server Component
+// ✅ Updated to async params for Next.js 15
 export default async function CateringItemPage({ params }) {
-  const { id } = params;
+  const { id } = await params; // Await params here
 
   try {
     const docRef = doc(db, "catering", id);
@@ -51,7 +51,7 @@ export default async function CateringItemPage({ params }) {
     const item = {
       id: docSnap.id,
       name: itemData.name,
-      imageURL: itemData.imageURL || null, // FIX: Avoid empty string in src
+      imageURL: itemData.imageURL || null,
       description: itemData.description,
       price: itemData.price,
       originalPrice: itemData.originalPrice || null,
@@ -62,7 +62,6 @@ export default async function CateringItemPage({ params }) {
     return (
       <div className="min-h-screen bg-white pb-24">
         <div className="max-w-7xl mx-auto px-6 pt-32 md:pt-40">
-          {/* Main Content Layout */}
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
             {/* Image Section */}
             <div className="relative w-full lg:w-1/2 group">
@@ -84,7 +83,6 @@ export default async function CateringItemPage({ params }) {
                   </div>
                 )}
 
-                {/* Floating Discount Badge */}
                 {item.discountedPrice && (
                   <div className="absolute top-6 right-6 bg-rush text-white font-display font-black px-6 py-2 rounded-full uppercase text-xs tracking-widest shadow-lg animate-bounce">
                     Limited Offer
@@ -104,7 +102,6 @@ export default async function CateringItemPage({ params }) {
                 </h1>
               </div>
 
-              {/* Price & Badge */}
               <div className="flex items-center gap-6 py-4 border-y border-gray-100">
                 {item.originalPrice && item.discountedPrice ? (
                   <div className="flex items-baseline gap-4">
@@ -131,13 +128,11 @@ export default async function CateringItemPage({ params }) {
                 </div>
               </div>
 
-              {/* Description */}
               <div className="space-y-4">
                 <p className="font-sans text-lg md:text-xl text-fashion/70 leading-relaxed italic">
                   &quot;{item.description}&quot;
                 </p>
 
-                {/* Product Meta */}
                 <div className="flex flex-wrap gap-4 pt-4">
                   <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-fashion/60">
                     <Clock className="w-3 h-3 text-rush" /> 24h Advance Order
@@ -148,7 +143,6 @@ export default async function CateringItemPage({ params }) {
                 </div>
               </div>
 
-              {/* Action */}
               <div className="pt-8">
                 <AddToCartButton item={item} />
                 <p className="mt-4 text-[10px] text-center lg:text-left text-gray-400 font-sans uppercase tracking-widest">
@@ -158,7 +152,6 @@ export default async function CateringItemPage({ params }) {
             </div>
           </div>
 
-          {/* Back Navigation */}
           <div className="mt-20 pt-6 border-t text-center mx-auto border-gray-100">
             <Link
               href="/catering"
