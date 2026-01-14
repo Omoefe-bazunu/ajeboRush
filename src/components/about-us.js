@@ -21,14 +21,14 @@ export default function AboutUs() {
 
             <p className="font-display text-xl md:text-2xl text-fashion/80 leading-relaxed font-medium">
               AjeboRush is a bridge between the vibrant streets of Lagos and the
-              high-energy pulse of America. Born from a passion for the "Soft
-              Life," we curate experiences that feed both the soul and the
+              high-energy pulse of America. Born from a passion for the Soft
+              Life, we curate experiences that feed both the soul and the
               aesthetic.
             </p>
           </div>
 
           <p className="font-sans text-lg text-gray-500 leading-relaxed max-w-xl">
-            From gourmet Afro-fusion catering that redefines "fine dining" to
+            From gourmet Afro-fusion catering that redefines fine dining to
             exclusive streetwear blending Aso-Oke heritage with US urban
             sleekness, we don't just deliver products; we deliver the{" "}
             <span className="text-fashion font-bold">Ajebo Standard.</span>

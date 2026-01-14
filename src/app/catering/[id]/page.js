@@ -180,7 +180,7 @@ export default async function CateringItemPage({ params }) {
           Kitchen Error
         </h1>
         <p className="font-sans text-gray-500 mb-8">
-          We're having trouble retrieving this dish.
+          We are having trouble retrieving this dish.
         </p>
         <Button
           href="/catering"

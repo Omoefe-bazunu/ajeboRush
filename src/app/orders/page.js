@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function UserOrders() {
   const { user } = useAuth();
@@ -225,7 +226,7 @@ export default function UserOrders() {
                       {/* Itemized List */}
                       <div>
                         <h4 className="font-display font-bold text-xs uppercase tracking-widest text-rush flex items-center gap-2 mb-4">
-                          <Package className="w-4 h-4" /> Manifest
+                          <Package className="w-4 h-4" /> Order
                         </h4>
                         <div className="space-y-4">
                           {order.cartItems?.map((item, index) => (
@@ -236,11 +237,23 @@ export default function UserOrders() {
                               {/* Small Preview if image exists */}
                               <div className="relative w-16 h-16 shrink-0 bg-gray-50 rounded-xl overflow-hidden">
                                 {item.imageURL ? (
-                                  <img
-                                    src={item.imageURL}
-                                    alt={item.name}
-                                    className="object-cover w-full h-full"
-                                  />
+                                  <div className="relative w-16 h-16 shrink-0 bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
+                                    {item.imageURL ? (
+                                      <Image
+                                        src={item.imageURL}
+                                        alt={item.name}
+                                        fill
+                                        sizes="64px"
+                                        className="object-cover transition-transform duration-500 group-hover/item:scale-110"
+                                      />
+                                    ) : (
+                                      <div className="flex items-center justify-center w-full h-full text-[8px] text-fashion/20 font-black uppercase">
+                                        {item.type === "fashion"
+                                          ? "Piece"
+                                          : "Dish"}
+                                      </div>
+                                    )}
+                                  </div>
                                 ) : (
                                   <div className="flex items-center justify-center w-full h-full text-[8px] text-fashion/20 font-black">
                                     DROP
