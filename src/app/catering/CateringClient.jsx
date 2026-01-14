@@ -62,7 +62,7 @@ export default function CateringClient() {
           </span>
 
           <h1 className="font-display text-7xl md:text-9xl font-black text-fashion uppercase tracking-tighter leading-none mt-4">
-            JELLOF <span className="text-rush italic">DIGEST</span>
+            JELLOF <span className="text-rush ">DIGEST</span>
           </h1>
         </header>
 

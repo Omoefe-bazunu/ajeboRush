@@ -1,44 +1,46 @@
-/* 1. Imports MUST be at the very top */
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Poppins:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
-:root {
-  /* AjeboRush Colors */
+/* 1. MANUAL STATIC FONT DECLARATIONS */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  /* Using the Bold version for headlines as seen in your screenshot */
+  src: url("/fonts/BricolageGrotesque-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  /* Using the Regular version for subheadings or UI elements */
+  src: url("/fonts/BricolageGrotesque-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* 2. THEME CONFIGURATION */
+@theme {
   --color-rush: #ff3131;
   --color-accent: #ffd700;
   --color-fashion: #0f0f0f;
 
-  /* Font Assignments - Tailwind v4 automatically maps --font-* to utility classes */
   --font-display: "Bricolage Grotesque", sans-serif;
   --font-sans: "Poppins", sans-serif;
-
-  --background: #ffffff;
-  --foreground: #0f0f0f;
 }
 
-@theme {
-  /* Mapping variables into Tailwind's theme system */
-  --color-rush: var(--color-rush);
-  --color-accent: var(--color-accent);
-  --color-fashion: var(--color-fashion);
-
-  --font-display: var(--font-display);
-  --font-sans: var(--font-sans);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #f5f5f5;
-  }
-}
-
-/* 2. Use @layer base to ensure these apply globally and correctly */
+/* 3. GLOBAL BASE STYLES */
 @layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #0f0f0f;
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans); /* Default to Poppins */
+    /* Falling back to system sans until Poppins is also moved to public/fonts */
+    font-family: ui-sans-serif, system-ui, sans-serif;
     @apply antialiased;
   }
 
@@ -47,9 +49,17 @@
   h3,
   h4,
   .font-display {
-    font-family: var(--font-display); /* Apply Bricolage to Headings */
-    font-optical-sizing: auto;
-    font-variation-settings: "wdth" 100;
+    font-family: "Bricolage Grotesque", sans-serif;
     @apply tracking-tight;
+  }
+
+  /* Applying Bold weight to your main headers */
+  h1,
+  .text-5xl,
+  .text-6xl,
+  .text-7xl,
+  .text-8xl,
+  .text-9xl {
+    font-weight: 700;
   }
 }

@@ -98,7 +98,7 @@ export default async function FashionItemPage({ params }) {
                 <span className="inline-block bg-fashion text-white px-4 py-1 rounded-full font-display font-black uppercase text-[10px] tracking-[0.3em]">
                   Limited Drop
                 </span>
-                <h1 className="font-display text-6xl md:text-8xl font-black text-fashion uppercase tracking-tighter leading-none">
+                <h1 className="font-display text-3xl md:text-5xl font-black text-fashion uppercase tracking-tighter leading-none">
                   {item.name}
                 </h1>
               </div>

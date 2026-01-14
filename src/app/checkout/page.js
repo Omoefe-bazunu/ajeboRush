@@ -191,7 +191,7 @@ export default function CheckoutPage() {
             Final Step
           </span>
           <h1 className="font-display text-5xl md:text-8xl font-black text-fashion uppercase tracking-tighter leading-none">
-            Secure <span className="text-rush italic">Checkout</span>
+            Secure <span className="text-rush">Checkout</span>
           </h1>
         </header>
 

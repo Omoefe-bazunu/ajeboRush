@@ -256,7 +256,7 @@ export default function CustomerReviews() {
                   {renderStars(userReview.rating)}
                 </div>
                 <p className="text-white text-xl font-display italic leading-relaxed">
-                  &quot{userReview.review}&quot
+                  {userReview.review}
                 </p>
               </div>
               <div className="flex gap-4 pt-4">

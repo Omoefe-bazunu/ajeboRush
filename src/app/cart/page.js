@@ -142,7 +142,7 @@ export default function CartPage() {
         {/* EDITORIAL HEADER */}
         <header className="mb-8 text-center mx-auto border-b border-gray-100 pb-8">
           <h1 className="font-display text-5xl md:text-8xl font-black text-fashion uppercase tracking-tighter leading-none">
-            YOUR<span className="text-rush italic">Cart</span>
+            YOUR<span className="text-rush">Cart</span>
           </h1>
         </header>
 

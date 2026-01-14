@@ -60,7 +60,7 @@ export default function FashionClient() {
           </span>
 
           <h1 className="font-display text-7xl md:text-9xl font-black text-white uppercase tracking-tighter leading-none mt-4">
-            ART <span className="text-rush italic">WEAR</span>
+            ART <span className="text-rush">WEAR</span>
           </h1>
         </header>
 

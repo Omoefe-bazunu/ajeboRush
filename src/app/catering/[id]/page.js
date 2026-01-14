@@ -97,7 +97,7 @@ export default async function CateringItemPage({ params }) {
                 <span className="inline-flex items-center gap-2 font-display text-rush font-bold uppercase tracking-[0.3em] text-xs">
                   Jellof Digest Signature
                 </span>
-                <h1 className="font-display text-5xl md:text-7xl font-black text-fashion uppercase tracking-tighter leading-none">
+                <h1 className="font-display text-3xl md:text-5xl font-black text-fashion uppercase tracking-tighter leading-none">
                   {item.name}
                 </h1>
               </div>

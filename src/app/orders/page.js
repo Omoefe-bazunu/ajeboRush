@@ -98,7 +98,7 @@ export default function UserOrders() {
         {/* EDITORIAL HEADER */}
         <header className="mb-8 border-b border-gray-100 pb-8">
           <h1 className="font-display text-5xl md:text-8xl font-black text-fashion uppercase tracking-tighter leading-none">
-            your <span className="text-rush italic">Orders</span>
+            your <span className="text-rush">Orders</span>
           </h1>
         </header>
 
