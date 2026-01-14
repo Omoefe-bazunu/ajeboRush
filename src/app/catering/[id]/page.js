@@ -6,6 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
 import { Undo, Clock, MapPin, Sparkles } from "lucide-react";
 
+// ✅ Dynamic Metadata for SEO
 export async function generateMetadata({ params }) {
   const { id } = params;
   try {
@@ -22,6 +23,7 @@ export async function generateMetadata({ params }) {
   }
 }
 
+// ✅ Server Component
 export default async function CateringItemPage({ params }) {
   const { id } = params;
 
@@ -132,7 +134,7 @@ export default async function CateringItemPage({ params }) {
               {/* Description */}
               <div className="space-y-4">
                 <p className="font-sans text-lg md:text-xl text-fashion/70 leading-relaxed italic">
-                  "{item.description}"
+                  &quot;{item.description}&quot;
                 </p>
 
                 {/* Product Meta */}

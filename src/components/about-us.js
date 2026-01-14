@@ -30,7 +30,7 @@ export default function AboutUs() {
           <p className="font-sans text-lg text-gray-500 leading-relaxed max-w-xl">
             From gourmet Afro-fusion catering that redefines fine dining to
             exclusive streetwear blending Aso-Oke heritage with US urban
-            sleekness, we don't just deliver products; we deliver the{" "}
+            sleekness, we don&apos;t just deliver products; we deliver the{" "}
             <span className="text-fashion font-bold">Ajebo Standard.</span>
           </p>
 

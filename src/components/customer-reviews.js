@@ -217,7 +217,7 @@ export default function CustomerReviews() {
                 {renderStars(current.rating)}
               </div>
               <blockquote className="font-display text-3xl md:text-5xl font-bold text-fashion leading-tight italic">
-                "{current.review}"
+                &apos;{current.review}&apos;
               </blockquote>
             </div>
           </div>
