@@ -307,7 +307,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <h2 className="font-display text-3xl font-black uppercase tracking-tighter mb-10 border-b border-white/10 pb-6">
-                  Manifest Summary
+                  Order Summary
                 </h2>
 
                 <div className="space-y-6 mb-12">

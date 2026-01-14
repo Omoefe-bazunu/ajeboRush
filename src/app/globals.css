@@ -1,33 +1,29 @@
-/* 1. ALL Imports must be at the top */
+/* 1. Imports MUST be at the very top */
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Poppins:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
-  /* AjeboRush Branding */
-  --brand-red: #ff3131;
-  --brand-yellow: #ffd700;
-  --brand-fashion: #0f0f0f;
+  /* AjeboRush Colors */
+  --color-rush: #ff3131;
+  --color-accent: #ffd700;
+  --color-fashion: #0f0f0f;
+
+  /* Font Assignments - Tailwind v4 automatically maps --font-* to utility classes */
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-sans: "Poppins", sans-serif;
 
   --background: #ffffff;
-  --foreground: var(--brand-fashion);
-
-  /* Font Assignments */
-  --font-primary: "Bricolage Grotesque", sans-serif;
-  --font-secondary: "Poppins", sans-serif;
+  --foreground: #0f0f0f;
 }
 
-@theme inline {
-  /* Brand Colors */
-  --color-rush: var(--brand-red);
-  --color-accent: var(--brand-yellow);
-  --color-fashion: var(--brand-fashion);
+@theme {
+  /* Mapping variables into Tailwind's theme system */
+  --color-rush: var(--color-rush);
+  --color-accent: var(--color-accent);
+  --color-fashion: var(--color-fashion);
 
-  /* Mapping Fonts for Tailwind Utility Classes */
-  --font-display: var(--font-primary);
-  --font-sans: var(--font-secondary);
-
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -37,21 +33,23 @@
   }
 }
 
-/* Global Base Styles */
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-secondary);
-  -webkit-font-smoothing: antialiased;
-}
+/* 2. Use @layer base to ensure these apply globally and correctly */
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans); /* Default to Poppins */
+    @apply antialiased;
+  }
 
-/* Auto-apply Bricolage to all Headings */
-h1,
-h2,
-h3,
-h4,
-.font-display {
-  font-family: var(--font-primary);
-  font-optical-sizing: auto;
-  font-variation-settings: "wdth" 100;
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-display); /* Apply Bricolage to Headings */
+    font-optical-sizing: auto;
+    font-variation-settings: "wdth" 100;
+    @apply tracking-tight;
+  }
 }
