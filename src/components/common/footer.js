@@ -25,7 +25,7 @@ export default function Footer() {
             </Link>
             <p className="font-sans text-white/50 text-lg max-w-sm leading-relaxed">
               Premium West African soul meeting American hustle. The US
-              destination for gourmet catering and luxury afro-streetwear.
+              destination for gourmet catering and luxury afro-wear.
             </p>
             <div className="flex gap-4">
               <a
@@ -54,7 +54,7 @@ export default function Footer() {
                   href="/catering"
                   className="hover:text-white transition-colors"
                 >
-                  Gourmet Catering
+                  Jellof Digest
                 </Link>
               </li>
               <li>
@@ -62,7 +62,7 @@ export default function Footer() {
                   href="/fashion"
                   className="hover:text-white transition-colors"
                 >
-                  Luxury Fashion
+                  ART Wear
                 </Link>
               </li>
               <li>
@@ -87,7 +87,7 @@ export default function Footer() {
           {/* Column 3: Contact Details */}
           <div>
             <h4 className="font-display font-bold uppercase tracking-widest text-rush mb-6 text-sm">
-              The Studio
+              Contact Us
             </h4>
             <ul className="space-y-4 font-sans text-white/70 text-sm">
               <li className="flex items-start gap-3">

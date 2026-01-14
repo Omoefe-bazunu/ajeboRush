@@ -42,7 +42,7 @@ export default function SignupPage() {
         <div className="w-full bg-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl">
           {/* Branded Header */}
           <div className="text-center mb-10">
-            <h2 className="font-display text-4xl md:text-5xl font-black text-fashion uppercase tracking-tighter leading-none mb-3">
+            <h2 className="font-display text-4xl text-nowrap md:text-5xl font-black text-fashion uppercase tracking-tighter leading-none mb-3">
               USER <span className="text-rush italic">SIGN UP</span>
             </h2>
             <div className="h-1 w-12 bg-rush mx-auto rounded-full mt-4" />
