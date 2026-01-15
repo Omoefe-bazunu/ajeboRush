@@ -57,7 +57,7 @@ export default async function Home() {
     <div className="min-h-screen font-sans selection:bg-rush selection:text-white">
       {/* HERO SECTION WITH TIGHTENED VERTICAL SPACE */}
       <section
-        className="relative flex flex-col justify-start overflow-hidden pt-32 pb-20 md:pt-48 md:pb-24 lg:min-h-screen"
+        className="relative flex flex-col justify-start overflow-hidden pt-40 pb-40 md:pt-48 md:pb-24 lg:min-h-screen"
         style={{
           backgroundImage: `url('/catering.jpg')`,
           backgroundSize: "cover",
