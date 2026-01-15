@@ -123,10 +123,10 @@ export default function AddCateringProduct() {
   };
 
   return (
-    <div className="w-full bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden relative">
+    <div className="w-full bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden relative">
       {/* SUCCESS MODAL */}
       {showSuccess && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-fashion/60 backdrop-blur-md">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-fashion/60 backdrop-blur-md">
           <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center border border-white/20 animate-rush">
             <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10 text-green-500" />
@@ -135,13 +135,13 @@ export default function AddCateringProduct() {
               Dish <span className="text-rush italic">Added</span>
             </h3>
             <p className="font-sans text-fashion/60 mb-8 uppercase text-[10px] font-bold tracking-widest">
-              Successfully synced with Jellof Digest
+              Successfully added
             </p>
             <button
               onClick={() => setShowSuccess(false)}
               className="w-full py-4 bg-rush text-white font-display font-black uppercase tracking-widest text-xs rounded-full hover:bg-fashion transition-all"
             >
-              Continue Prepping
+              Add more
             </button>
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function AddCateringProduct() {
             {/* NAME FIELD */}
             <div className="md:col-span-2 space-y-2">
               <label className="font-display font-black uppercase tracking-widest text-[10px] text-fashion flex items-center gap-2">
-                <Plus className="w-3 h-3 text-rush" /> Dish Designation
+                <Plus className="w-3 h-3 text-rush" /> Dish Name
               </label>
               <input
                 type="text"
@@ -320,7 +320,7 @@ export default function AddCateringProduct() {
             {loading ? (
               <>
                 <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                Syncing with Studio...
+                Submitting...
               </>
             ) : (
               "Add to Jellof Digest Menu"

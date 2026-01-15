@@ -126,25 +126,25 @@ export default function AddFashionProduct() {
   };
 
   return (
-    <div className="w-full bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden relative">
+    <div className="w-full bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden relative">
       {/* SUCCESS MODAL */}
       {showSuccess && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-fashion/60 backdrop-blur-md">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-fashion/60 backdrop-blur-md">
           <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center border border-white/20 animate-rush">
             <div className="w-20 h-20 bg-fashion rounded-full flex items-center justify-center mx-auto mb-6">
               <Sparkles className="w-10 h-10 text-rush" />
             </div>
             <h3 className="font-display text-3xl font-black text-fashion uppercase tracking-tighter mb-2">
-              Piece <span className="text-rush italic">Dropped</span>
+              Piece <span className="text-rush italic">Saved</span>
             </h3>
             <p className="font-sans text-fashion/60 mb-8 uppercase text-[10px] font-bold tracking-widest leading-relaxed">
-              New ART WEAR design is now live in the Archives
+              New ART WEAR design added
             </p>
             <button
               onClick={() => setShowSuccess(false)}
               className="w-full py-4 bg-fashion text-white font-display font-black uppercase tracking-widest text-xs rounded-full hover:bg-rush transition-all"
             >
-              Back to Studio
+              Add more
             </button>
           </div>
         </div>
