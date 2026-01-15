@@ -60,11 +60,15 @@ export default function ProductList() {
     setEditFormData({
       name: product.name,
       description: product.description,
+      type: product.type,
+      // Fashion-specific fields
       sizes: product.sizes ? product.sizes.join(", ") : "",
-      price: product.price,
+      price: product.price || "",
       originalPrice: product.originalPrice || "",
       discountedPrice: product.discountedPrice || "",
-      type: product.type,
+      // Catering-specific fields
+      fullPrice: product.fullPrice || "",
+      halfPrice: product.halfPrice || "",
     });
   };
 
@@ -75,23 +79,41 @@ export default function ProductList() {
 
   const handleUpdateSubmit = async (productId) => {
     try {
+      const isCatering = editFormData.type === "catering";
+
       const updateData = {
         name: editFormData.name,
         description: editFormData.description,
-        price: editFormData.discountedPrice
-          ? Number(editFormData.discountedPrice)
-          : Number(editFormData.price),
       };
 
-      if (editFormData.originalPrice && editFormData.discountedPrice) {
-        updateData.originalPrice = Number(editFormData.originalPrice);
-        updateData.discountedPrice = Number(editFormData.discountedPrice);
-      }
+      if (isCatering) {
+        // Handle Catering Dual Pricing
+        updateData.fullPrice = editFormData.fullPrice
+          ? Number(editFormData.fullPrice)
+          : null;
+        updateData.halfPrice = editFormData.halfPrice
+          ? Number(editFormData.halfPrice)
+          : null;
+        // Maintain fallback for general sorting/queries
+        updateData.price = Number(
+          editFormData.fullPrice || editFormData.halfPrice
+        );
+      } else {
+        // Handle Fashion Pricing
+        updateData.price = editFormData.discountedPrice
+          ? Number(editFormData.discountedPrice)
+          : Number(editFormData.price);
 
-      if (editFormData.type === "fashion" && editFormData.sizes) {
-        updateData.sizes = editFormData.sizes
-          .split(",")
-          .map((s) => s.trim().toUpperCase());
+        if (editFormData.originalPrice && editFormData.discountedPrice) {
+          updateData.originalPrice = Number(editFormData.originalPrice);
+          updateData.discountedPrice = Number(editFormData.discountedPrice);
+        }
+
+        if (editFormData.sizes) {
+          updateData.sizes = editFormData.sizes
+            .split(",")
+            .map((s) => s.trim().toUpperCase());
+        }
       }
 
       const productRef = doc(db, editFormData.type, productId);
@@ -127,7 +149,7 @@ export default function ProductList() {
             <Tag className="w-5 h-5" />
           </div>
           <h2 className="font-display text-2xl font-black text-fashion uppercase tracking-tighter">
-            Products <span className="text-rush italic">Management</span>
+            Inventory <span className="text-rush italic">Manifest</span>
           </h2>
         </div>
 
@@ -147,11 +169,11 @@ export default function ProductList() {
         <div className="py-20 text-center">
           <div className="w-8 h-8 border-4 border-rush border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="font-sans text-[10px] font-bold uppercase tracking-widest text-fashion/20">
-            Saving...
+            Syncing...
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-[2rem] border border-gray-100 shadow-sm bg-white">
+        <div className="overflow-x-auto rounded-4xl border border-gray-100 shadow-sm bg-white">
           <table className="min-w-full">
             <thead>
               <tr className="bg-fashion text-white">
@@ -162,7 +184,7 @@ export default function ProductList() {
                   Product Identity
                 </th>
                 <th className="px-6 py-5 text-left font-display font-black uppercase text-[10px] tracking-widest">
-                  Price
+                  Valuation
                 </th>
                 <th className="px-6 py-5 text-right font-display font-black uppercase text-[10px] tracking-widest">
                   Actions
@@ -209,13 +231,13 @@ export default function ProductList() {
                           name="name"
                           value={editFormData.name}
                           onChange={handleUpdateChange}
-                          className="w-full bg-white border border-gray-200 rounded-lg p-2 font-sans text-sm focus:border-rush outline-none shadow-inner"
+                          className="w-full bg-white border border-gray-200 rounded-lg p-2 font-sans text-sm focus:border-rush outline-none"
                         />
                         <textarea
                           name="description"
                           value={editFormData.description}
                           onChange={handleUpdateChange}
-                          className="w-full bg-white border border-gray-200 rounded-lg p-2 font-sans text-xs focus:border-rush outline-none shadow-inner"
+                          className="w-full bg-white border border-gray-200 rounded-lg p-2 font-sans text-xs focus:border-rush outline-none"
                           rows="2"
                         />
                         {product.type === "fashion" && (
@@ -231,7 +253,7 @@ export default function ProductList() {
                       </div>
                     ) : (
                       <div className="max-w-xs">
-                        <p className="font-display text-lg font-black text-fashion uppercase tracking-tighter leading-none mb-1">
+                        <p className="font-display text-lg font-black text-fashion uppercase tracking-tighter mb-1">
                           {product.name}
                         </p>
                         <p className="font-sans text-[10px] text-fashion/40 line-clamp-1 italic">
@@ -253,50 +275,109 @@ export default function ProductList() {
                     )}
                   </td>
 
-                  {/* VALUATION COLUMN */}
+                  {/* VALUATION COLUMN (Logic Split) */}
                   <td className="px-6 py-5">
                     {editingId === product.id ? (
                       <div className="space-y-2">
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[8px] font-black text-fashion/30 uppercase tracking-widest px-1">
-                            Base
-                          </span>
-                          <input
-                            type="number"
-                            name="price"
-                            value={editFormData.price}
-                            onChange={handleUpdateChange}
-                            className="w-24 bg-white border border-gray-200 rounded-lg p-2 font-display font-black text-xs"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[8px] font-black text-rush uppercase tracking-widest px-1">
-                            Sale
-                          </span>
-                          <input
-                            type="number"
-                            name="discountedPrice"
-                            value={editFormData.discountedPrice}
-                            onChange={handleUpdateChange}
-                            className="w-24 bg-rush/5 border border-rush/20 rounded-lg p-2 font-display font-black text-rush text-xs"
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col">
-                        {product.originalPrice && product.discountedPrice ? (
+                        {product.type === "catering" ? (
                           <>
-                            <span className="font-display font-black text-rush text-xl leading-none tracking-tighter">
-                              ${product.discountedPrice}
-                            </span>
-                            <span className="font-sans text-[10px] text-fashion/20 line-through font-bold">
-                              ${product.originalPrice}
-                            </span>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[8px] font-black text-fashion/30 uppercase px-1">
+                                Full Price
+                              </span>
+                              <input
+                                type="number"
+                                name="fullPrice"
+                                value={editFormData.fullPrice}
+                                onChange={handleUpdateChange}
+                                className="w-24 bg-white border border-gray-200 rounded-lg p-2 font-display font-black text-xs"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[8px] font-black text-rush uppercase px-1">
+                                Half Price
+                              </span>
+                              <input
+                                type="number"
+                                name="halfPrice"
+                                value={editFormData.halfPrice}
+                                onChange={handleUpdateChange}
+                                className="w-24 bg-rush/5 border border-rush/20 rounded-lg p-2 font-display font-black text-rush text-xs"
+                              />
+                            </div>
                           </>
                         ) : (
-                          <span className="font-display font-black text-fashion text-xl leading-none tracking-tighter">
-                            ${product.price}
-                          </span>
+                          <>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[8px] font-black text-fashion/30 uppercase px-1">
+                                Base
+                              </span>
+                              <input
+                                type="number"
+                                name="price"
+                                value={editFormData.price}
+                                onChange={handleUpdateChange}
+                                className="w-24 bg-white border border-gray-100 rounded-lg p-2 font-display font-black text-xs"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[8px] font-black text-rush uppercase px-1">
+                                Sale
+                              </span>
+                              <input
+                                type="number"
+                                name="discountedPrice"
+                                value={editFormData.discountedPrice}
+                                onChange={handleUpdateChange}
+                                className="w-24 bg-rush/5 border border-rush/20 rounded-lg p-2 font-display font-black text-rush text-xs"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-1">
+                        {product.type === "catering" ? (
+                          <>
+                            {product.fullPrice && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-[8px] font-black text-fashion/30 uppercase">
+                                  F
+                                </span>
+                                <span className="font-display font-black text-fashion text-lg leading-none tracking-tighter">
+                                  ${product.fullPrice}
+                                </span>
+                              </div>
+                            )}
+                            {product.halfPrice && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-[8px] font-black text-rush/40 uppercase">
+                                  H
+                                </span>
+                                <span className="font-display font-black text-rush text-lg leading-none tracking-tighter">
+                                  ${product.halfPrice}
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            {product.originalPrice &&
+                            product.discountedPrice ? (
+                              <>
+                                <span className="font-display font-black text-rush text-xl leading-none tracking-tighter">
+                                  ${product.discountedPrice}
+                                </span>
+                                <span className="font-sans text-[10px] text-fashion/20 line-through font-bold">
+                                  ${product.originalPrice}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="font-display font-black text-fashion text-xl leading-none tracking-tighter">
+                                ${product.price}
+                              </span>
+                            )}
+                          </>
                         )}
                       </div>
                     )}

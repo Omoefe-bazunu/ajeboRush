@@ -62,11 +62,11 @@ export default async function FashionItemPage({ params }) {
 
     return (
       <main className="min-h-screen bg-white pb-24">
-        <div className="max-w-7xl mx-auto px-6 pt-32 md:pt-44">
+        <div className="max-w-7xl mx-auto px-6 pt-20 md:pt-44">
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
             {/* STICKY IMAGE SECTION */}
             <div className="w-full lg:w-3/5 lg:sticky lg:top-40 h-fit">
-              <div className="relative h-[500px] md:h-[750px] w-full rounded-[2.5rem] overflow-hidden shadow-2xl group border-8 border-gray-50">
+              <div className="relative h-125 md:h-187.5 w-full rounded-[2.5rem] overflow-hidden shadow-2xl group border-8 border-gray-50">
                 {item.imageURL ? (
                   <Image
                     src={item.imageURL}

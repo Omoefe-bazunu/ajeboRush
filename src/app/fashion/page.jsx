@@ -1,3 +1,4 @@
+import BespokeRequestForm from "@/components/CustomOrder";
 import FashionClient from "./FashionClient"; // ✅ Correct import
 
 export const metadata = {
@@ -7,5 +8,10 @@ export const metadata = {
 };
 
 export default function FashionPage() {
-  return <FashionClient />;
+  return (
+    <>
+      <FashionClient />
+      <BespokeRequestForm />
+    </>
+  );
 }

@@ -1,3 +1,4 @@
+import BespokeRequestForm from "@/components/CustomOrder";
 import CateringClient from "./CateringClient";
 
 export const metadata = {
@@ -7,5 +8,10 @@ export const metadata = {
 };
 
 export default function CateringPage() {
-  return <CateringClient />;
+  return (
+    <>
+      <CateringClient />
+      <BespokeRequestForm />
+    </>
+  );
 }

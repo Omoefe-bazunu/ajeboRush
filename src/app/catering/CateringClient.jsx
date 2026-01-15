@@ -44,7 +44,7 @@ export default function CateringClient() {
   );
 
   return (
-    <div className="min-h-screen py-32 px-6 md:px-12 bg-white selection:bg-rush selection:text-white">
+    <div className="min-h-screen py-20 px-6 md:px-12 bg-white selection:bg-rush selection:text-white">
       <div className="max-w-7xl mx-auto">
         {/* JELLOF DIGEST BRANDED HEADER */}
         <header className="text-center mb-8 relative">

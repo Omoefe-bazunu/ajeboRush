@@ -20,63 +20,70 @@ import {
   Receipt,
   CheckCircle,
   Clock,
+  Sparkles,
+  Phone,
+  ChefHat,
+  Shirt,
+  X,
+  Maximize2,
+  ImageDownIcon,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function OrdersList() {
+  const [activeTab, setActiveTab] = useState("standard");
   const [orders, setOrders] = useState([]);
+  const [customOrders, setCustomOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
-  const [fulfillingId, setFulfillingId] = useState(null); // Tracks specific button loading
+  const [fulfillingId, setFulfillingId] = useState(null);
+  const [fullScreenImage, setFullScreenImage] = useState(null);
 
-  // Real-time listener for orders
   useEffect(() => {
-    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
-
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const ordersData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setOrders(ordersData);
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Error fetching orders:", error);
-        setLoading(false);
-      }
+    const standardQuery = query(
+      collection(db, "orders"),
+      orderBy("createdAt", "desc")
     );
+    const unsubStandard = onSnapshot(standardQuery, (snapshot) => {
+      setOrders(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    });
 
-    return () => unsubscribe();
+    const customQuery = query(
+      collection(db, "CustomOrders"),
+      orderBy("createdAt", "desc")
+    );
+    const unsubCustom = onSnapshot(customQuery, (snapshot) => {
+      setCustomOrders(
+        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+      );
+      setLoading(false);
+    });
+
+    return () => {
+      unsubStandard();
+      unsubCustom();
+    };
   }, []);
 
-  const toggleExpand = (id) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
-
-  const handleMarkAsFulfilled = async (orderId) => {
-    setFulfillingId(orderId);
+  const handleUpdateStatus = async (collectionName, docId, newStatus) => {
+    setFulfillingId(docId);
     try {
-      const orderRef = doc(db, "orders", orderId);
-      await updateDoc(orderRef, {
-        status: "completed",
+      const docRef = doc(db, collectionName, docId);
+      await updateDoc(docRef, {
+        status: newStatus,
         fulfilledAt: new Date(),
       });
-      // onSnapshot will handle the UI update automatically
     } catch (error) {
-      console.error("Error updating order:", error);
-      alert("Failed to update status. Please try again.");
+      console.error("Fulfillment Error:", error);
     } finally {
       setFulfillingId(null);
     }
   };
 
   const formatDate = (timestamp) => {
-    if (!timestamp) return "Date unknown";
+    if (!timestamp) return "N/A";
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
+    return date.toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       hour: "2-digit",
@@ -85,253 +92,375 @@ export default function OrdersList() {
   };
 
   const getStatusStyle = (status) => {
-    switch (status) {
-      case "pending":
-        return "bg-accent text-fashion border-accent";
-      case "completed":
-        return "bg-fashion text-white border-fashion";
-      case "cancelled":
-        return "bg-rush/10 text-rush border-rush/20";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
+    const s = status?.toLowerCase();
+    if (s === "pending" || s === "unprocessed")
+      return "bg-accent text-fashion border-accent";
+    if (s === "completed" || s === "processed")
+      return "bg-fashion text-white border-fashion";
+    return "bg-gray-100 text-gray-400 border-gray-200";
   };
 
-  if (loading) {
+  if (loading)
     return (
       <div className="py-20 text-center">
         <div className="w-10 h-10 border-4 border-rush border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="font-display font-bold uppercase tracking-widest text-[10px] text-fashion/20">
-          Accessing Studio Archives...
-        </p>
       </div>
     );
-  }
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-3 mb-10">
-        <div className="p-2 bg-fashion text-white rounded-lg">
-          <ShoppingBag className="w-5 h-5" />
+      {/* HEADER & TABS */}
+      <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12 border-b border-gray-100 pb-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-fashion text-white rounded-lg">
+            <Receipt className="w-5 h-5" />
+          </div>
+          <h2 className="font-display text-2xl font-black text-fashion uppercase tracking-tighter">
+            All <span className="text-rush italic">Orders</span>
+          </h2>
         </div>
-        <h2 className="font-display text-2xl font-black text-fashion uppercase tracking-tighter">
-          Transaction <span className="text-rush italic">Orders</span>
-        </h2>
+        <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
+          <button
+            onClick={() => setActiveTab("standard")}
+            className={`px-6 py-2.5 rounded-xl font-display font-black uppercase text-[10px] tracking-widest transition-all ${
+              activeTab === "standard"
+                ? "bg-white text-rush shadow-sm"
+                : "text-fashion/30"
+            }`}
+          >
+            Regular Orders ({orders.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("custom")}
+            className={`px-6 py-2.5 rounded-xl font-display font-black uppercase text-[10px] tracking-widest transition-all ${
+              activeTab === "custom"
+                ? "bg-white text-rush shadow-sm"
+                : "text-fashion/30"
+            }`}
+          >
+            Custom Orders ({customOrders.length})
+          </button>
+        </div>
       </div>
 
-      {orders.length === 0 ? (
-        <div className="py-20 text-center bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-100">
-          <p className="font-display text-xl font-bold text-fashion/30 uppercase tracking-tighter">
-            The Ledger is Empty
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className={`group border-2 transition-all duration-500 rounded-[2rem] overflow-hidden ${
-                expandedId === order.id
-                  ? "border-rush shadow-2xl bg-white"
-                  : "border-gray-50 bg-gray-50/30 hover:bg-white hover:border-gray-100"
-              }`}
-            >
-              {/* HEADER BAR */}
-              <button
-                onClick={() => toggleExpand(order.id)}
-                className="w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8"
+      <div className="space-y-6">
+        {activeTab === "standard"
+          ? orders.map((order) => (
+              <div
+                key={order.id}
+                className={`border-2 rounded-4xl overflow-hidden transition-all ${
+                  expandedId === order.id
+                    ? "border-rush bg-white shadow-2xl"
+                    : "border-gray-50 bg-gray-50/30"
+                }`}
               >
-                <div className="flex-1 text-left">
-                  <div className="flex flex-wrap items-center gap-4 mb-3">
-                    <h3 className="font-display text-xl font-black text-fashion uppercase tracking-tighter leading-none">
-                      Order{" "}
-                      <span className="text-rush">
-                        #{order.id.slice(-8).toUpperCase()}
+                <button
+                  onClick={() =>
+                    setExpandedId(expandedId === order.id ? null : order.id)
+                  }
+                  className="w-full flex flex-col md:flex-row items-center justify-between p-8"
+                >
+                  <div className="text-left">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-display text-lg font-black uppercase tracking-tight">
+                        Order{" "}
+                        <span className="text-rush">
+                          #{order.id.slice(-6).toUpperCase()}
+                        </span>
+                      </h3>
+                      <span
+                        className={`px-3 py-0.5 rounded-full text-[8px] font-black uppercase border ${getStatusStyle(
+                          order.status
+                        )}`}
+                      >
+                        {order.status}
                       </span>
-                    </h3>
-                    <span
-                      className={`px-4 py-1 rounded-full text-[10px] font-display font-black uppercase tracking-widest border ${getStatusStyle(
-                        order.status
-                      )}`}
-                    >
-                      {order.status}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <p className="font-sans text-xs font-bold text-fashion/60 uppercase tracking-widest flex items-center gap-2">
-                      <User className="w-3 h-3 text-rush" />{" "}
-                      {order.customerName}
-                    </p>
-                    <p className="font-sans text-[10px] font-bold text-fashion/30 uppercase tracking-widest">
-                      {formatDate(order.createdAt)}
+                    </div>
+                    <p className="text-[10px] font-bold text-fashion/40 uppercase tracking-widest">
+                      {order.customerName} • {formatDate(order.createdAt)}
                     </p>
                   </div>
-                </div>
+                  <div className="flex items-center gap-6 mt-4 md:mt-0">
+                    <p className="font-display text-2xl font-black text-fashion">
+                      ${order.totalAmount?.toFixed(2)}
+                    </p>
+                    <ChevronDown
+                      className={`text-rush transition-transform ${
+                        expandedId === order.id ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
+                </button>
 
-                <div className="flex items-center gap-8 w-full md:w-auto justify-between md:justify-end mt-4 md:mt-0 border-t md:border-t-0 border-gray-100 pt-4 md:pt-0">
-                  <div className="text-right">
-                    <span className="text-[10px] font-display font-black text-fashion/20 uppercase tracking-widest block">
-                      Settlement
-                    </span>
-                    <p className="font-display text-2xl font-black text-fashion leading-none mt-1">
-                      ${order.totalAmount?.toFixed(2) || "0.00"}
-                    </p>
-                  </div>
-                  <ChevronDown
-                    size={20}
-                    className={`text-rush transition-transform duration-500 ${
-                      expandedId === order.id ? "rotate-180" : ""
-                    }`}
-                  />
-                </div>
-              </button>
-
-              {/* EXPANDED CONTENT */}
-              {expandedId === order.id && (
-                <div className="p-8 md:p-12 bg-white border-t border-gray-50 animate-fade-in">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                    {/* LEFT: Client Dossier */}
-                    <div className="lg:col-span-1 space-y-8">
-                      <div className="space-y-6">
-                        <div>
-                          <h4 className="font-display font-bold text-[10px] uppercase tracking-widest text-rush flex items-center gap-2 mb-4">
-                            <User className="w-3 h-3" /> Client Dossier
+                {expandedId === order.id && (
+                  <div className="p-8 md:p-12 border-t border-gray-50 animate-in fade-in duration-500">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                      <div className="space-y-8">
+                        <div className="space-y-6">
+                          <h4 className="font-display font-black text-[10px] uppercase tracking-widest text-rush flex items-center gap-2">
+                            <User className="w-3 h-3" /> Client Details
                           </h4>
                           <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4 shadow-inner">
-                            <div>
-                              <p className="text-[8px] font-black text-fashion/30 uppercase tracking-[0.2em] mb-1">
-                                Full Name
-                              </p>
-                              <p className="font-display font-black text-fashion uppercase text-lg leading-none">
-                                {order.customerName}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-[8px] font-black text-fashion/30 uppercase tracking-[0.2em] mb-1">
-                                Email Link
-                              </p>
-                              <a
-                                href={`mailto:${order.userEmail}`}
-                                className="font-sans text-sm font-bold text-rush hover:underline decoration-rush/20 break-all leading-none"
-                              >
-                                {order.userEmail}
-                              </a>
-                            </div>
+                            <InfoRow
+                              label="Full Name"
+                              value={order.customerName}
+                            />
+                            <InfoRow
+                              label="Email Link"
+                              value={order.userEmail}
+                              isLink
+                              href={`mailto:${order.userEmail}`}
+                            />
                           </div>
-                        </div>
-
-                        <div>
-                          <h4 className="font-display font-bold text-[10px] uppercase tracking-widest text-rush flex items-center gap-2 mb-4">
-                            <MapPin className="w-3 h-3" /> Logistics Destination
+                          <h4 className="font-display font-black text-[10px] uppercase tracking-widest text-rush flex items-center gap-2">
+                            <MapPin className="w-3 h-3" /> Logistics
                           </h4>
                           <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 shadow-inner">
-                            <p className="font-sans text-sm text-fashion/80 leading-relaxed font-medium">
-                              {order.address} <br />
-                              {order.city}, {order.state} {order.zip}
+                            <p className="font-sans text-sm text-fashion/80 leading-relaxed">
+                              {order.address} <br /> {order.city}, {order.state}{" "}
+                              {order.zip}
                             </p>
                           </div>
                         </div>
-                      </div>
-
-                      {/* ACTION: FULFILL BUTTON */}
-                      <div className="pt-4">
-                        {order.status === "pending" ? (
+                        {order.status === "pending" && (
                           <button
-                            onClick={() => handleMarkAsFulfilled(order.id)}
+                            onClick={() =>
+                              handleUpdateStatus(
+                                "orders",
+                                order.id,
+                                "completed"
+                              )
+                            }
                             disabled={fulfillingId === order.id}
-                            className="w-full flex items-center justify-center gap-3 bg-fashion text-white py-5 rounded-full font-display font-black uppercase tracking-[0.2em] text-xs hover:bg-rush transition-all shadow-xl shadow-fashion/10 disabled:opacity-50 disabled:cursor-not-allowed group"
+                            className="w-full py-5 bg-fashion text-white rounded-full font-display font-black uppercase text-xs tracking-widest"
                           >
-                            {fulfillingId === order.id ? (
-                              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : (
-                              <>
-                                <CheckCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                Mark as Fulfilled
-                              </>
-                            )}
+                            {fulfillingId === order.id
+                              ? "Updating..."
+                              : "Mark as Fulfilled"}
                           </button>
-                        ) : (
-                          <div className="flex items-center gap-3 p-5 bg-gray-50 rounded-full border border-gray-100 justify-center">
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                            <span className="font-display font-black uppercase text-[10px] tracking-widest text-fashion/40">
-                              Order Completed
-                            </span>
-                          </div>
                         )}
                       </div>
-                    </div>
-
-                    {/* RIGHT: Order Items */}
-                    <div className="lg:col-span-2">
-                      <h4 className="font-display font-bold text-[10px] uppercase tracking-widest text-rush flex items-center gap-2 mb-4">
-                        <Package className="w-3 h-3" /> Itemized Order
-                      </h4>
-                      <div className="space-y-3 ">
-                        {order.cartItems?.map((item, index) => (
-                          <div
-                            key={index}
-                            className="flex flex-col md:flex-row items-center justify-between p-5 bg-white border border-gray-100 rounded-2xl hover:shadow-md transition-shadow group/item"
-                          >
-                            <div className="flex items-center w-full gap-4">
-                              <div className="w-12 h-12 border-r flex items-center justify-center font-display font-black text-[10px] text-fashion/20 group-hover/item:text-rush transition-colors border-gray-100">
-                                {index + 1}
-                              </div>
-                              <div className=" w-full flex flex-col md:flex-row">
-                                <p className="font-display font-black text-fashion uppercase tracking-tight leading-none mb-1">
-                                  {item.name}
-                                </p>
-                                <div className="flex items-center gap-3">
-                                  {item.selectedSize && (
-                                    <span className="text-[8px] font-black bg-fashion text-white px-2 py-0.5 rounded-full uppercase tracking-widest">
-                                      Size: {item.selectedSize}
-                                    </span>
+                      <div className="lg:col-span-2">
+                        <h4 className="font-display font-black text-[10px] uppercase tracking-widest text-rush flex items-center gap-2 mb-4">
+                          <Package className="w-3 h-3" /> Itemized List
+                        </h4>
+                        <div className="space-y-3">
+                          {order.cartItems?.map((item, i) => (
+                            <div
+                              key={i}
+                              className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl"
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-50">
+                                  {item.imageURL ? (
+                                    <Image
+                                      src={item.imageURL}
+                                      alt={item.name}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <div className="flex items-center justify-center h-full text-[8px] font-black text-fashion/20">
+                                      AJEBO
+                                    </div>
                                   )}
-                                  <span className="font-sans text-[10px] font-bold text-fashion/40 uppercase tracking-widest">
-                                    {item.quantity} Unit(s)
-                                  </span>
+                                </div>
+                                <div>
+                                  <p className="font-display font-black text-xs text-fashion uppercase truncate">
+                                    {item.name}
+                                  </p>
+                                  <p className="font-sans text-[8px] font-black text-rush uppercase tracking-widest">
+                                    {item.selectedOption || item.selectedSize}
+                                  </p>
                                 </div>
                               </div>
+                              <div className="text-right">
+                                <p className="font-display font-black text-fashion text-sm">
+                                  ${(item.quantity * item.price).toFixed(2)}
+                                </p>
+                                <p className="font-sans text-[8px] text-fashion/30 font-bold uppercase">
+                                  {item.quantity} x ${item.price.toFixed(2)}
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex w-full flex-col mt-3 md:mt-0">
-                              <p className="font-display font-black text-fashion text-lg leading-none">
-                                ${(item.quantity * item.price).toFixed(2)}
-                              </p>
-                              <p className="font-sans text-[10px] text-fashion/30 font-bold uppercase mt-1">
-                                @ ${item.price?.toFixed(2)}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="mt-8 p-6 bg-fashion text-white rounded-[2rem] shadow-xl flex flex-col justify-between items-center relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-8 opacity-5">
-                          <Receipt className="w-24 h-24" />
+                          ))}
                         </div>
-                        <div className="flex items-center gap-4 relative z-10">
-                          <div className="p-3 bg-white/10 rounded-2xl">
-                            <Clock className="w-5 h-5 text-rush" />
-                          </div>
-                          <div>
-                            <p className="font-display font-black uppercase text-[10px] tracking-widest text-white/40 leading-none mb-1">
-                              Settlement Total
-                            </p>
-                            <p className="font-sans text-xs font-medium text-white/60 uppercase tracking-tighter">
-                              Verified Payment Received.
-                            </p>
-                          </div>
-                        </div>
-                        <p className="font-display w-full mt-4 text-4xl font-black tracking-tighter relative z-10">
-                          ${order.totalAmount?.toFixed(2)}
-                        </p>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            ))
+          : customOrders.map((manifest) => (
+              <div
+                key={manifest.id}
+                className={`border-2 rounded-4xl overflow-hidden transition-all ${
+                  expandedId === manifest.id
+                    ? "border-fashion bg-white shadow-2xl"
+                    : "border-gray-50 bg-gray-50/30"
+                }`}
+              >
+                <button
+                  onClick={() =>
+                    setExpandedId(
+                      expandedId === manifest.id ? null : manifest.id
+                    )
+                  }
+                  className="w-full flex flex-col md:flex-row items-center justify-between p-8"
+                >
+                  <div className="text-left">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-display text-lg font-black uppercase tracking-tight text-fashion">
+                        Custom{" "}
+                        <span className="text-fashion/30 italic">Orders</span>
+                      </h3>
+                      <span
+                        className={`px-3 py-0.5 rounded-full text-[8px] font-black uppercase border ${getStatusStyle(
+                          manifest.status
+                        )}`}
+                      >
+                        {manifest.status || "Unprocessed"}
+                      </span>
+                    </div>
+                    <p className="text-[10px] font-bold text-fashion/40 uppercase tracking-widest">
+                      {manifest.name} • {formatDate(manifest.createdAt)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-6 mt-4 md:mt-0">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
+                      {manifest.category === "catering" ? (
+                        <ChefHat className="w-3 h-3 text-rush" />
+                      ) : (
+                        <Shirt className="w-3 h-3 text-fashion" />
+                      )}
+                      <span className="text-[8px] font-black uppercase tracking-widest text-fashion">
+                        {manifest.category}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      className={`text-fashion transition-transform ${
+                        expandedId === manifest.id ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
+                </button>
+                {expandedId === manifest.id && (
+                  <div className="p-8 md:p-12 border-t border-gray-50 animate-in fade-in duration-500">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                      <div className="space-y-6">
+                        <h4 className="font-display font-black text-[10px] uppercase tracking-widest text-rush flex items-center gap-2">
+                          <User className="w-3 h-3" /> Requester Info
+                        </h4>
+                        <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-4 shadow-inner">
+                          <InfoRow label="Full Name" value={manifest.name} />
+                          <InfoRow
+                            label="Email Link"
+                            value={manifest.email}
+                            isLink
+                            href={`mailto:${manifest.email}`}
+                          />
+                          <InfoRow
+                            label="Phone Link"
+                            value={manifest.phone}
+                            isLink
+                            href={`tel:${manifest.phone}`}
+                          />
+                        </div>
+                        <h4 className="font-display font-black text-[10px] uppercase tracking-widest text-rush flex items-center gap-2">
+                          <Sparkles className="w-3 h-3" /> Narrative
+                        </h4>
+                        <p className="font-sans text-sm text-fashion/70 leading-relaxed italic bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                          &quot;{manifest.description}&quot;
+                        </p>
+                        {(manifest.status === "Unprocessed" ||
+                          !manifest.status) && (
+                          <button
+                            onClick={() =>
+                              handleUpdateStatus(
+                                "CustomOrders",
+                                manifest.id,
+                                "Processed"
+                              )
+                            }
+                            disabled={fulfillingId === manifest.id}
+                            className="w-full py-4 bg-fashion text-white rounded-full font-display font-black uppercase tracking-widest text-[10px] hover:bg-rush"
+                          >
+                            {fulfillingId === manifest.id
+                              ? "Processing..."
+                              : "Mark as Processed"}
+                          </button>
+                        )}
+                      </div>
+                      <div className="space-y-6">
+                        <h4 className="font-display font-black text-[10px] uppercase tracking-widest text-rush flex items-center gap-2">
+                          <ImageDownIcon className="w-3 h-3" /> Inspiration
+                          Assets
+                        </h4>
+                        <div className="grid grid-cols-3 gap-4">
+                          {manifest.attachments?.map((url, i) => (
+                            <div
+                              key={i}
+                              className="relative aspect-square rounded-2xl overflow-hidden border-4 border-white shadow-md group cursor-zoom-in"
+                              onClick={() => setFullScreenImage(url)}
+                            >
+                              <Image
+                                src={url}
+                                alt="Inspiration"
+                                fill
+                                className="object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Maximize2 className="text-white w-6 h-6" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+      </div>
+
+      {/* FULL SCREEN LIGHTBOX */}
+      {fullScreenImage && (
+        <div
+          className="fixed inset-0 z-1000 bg-fashion/95 backdrop-blur-xl flex items-center justify-center p-6"
+          onClick={() => setFullScreenImage(null)}
+        >
+          <X className="absolute top-8 right-8 text-white w-10 h-10 cursor-pointer" />
+          <div className="relative w-full max-w-5xl aspect-video rounded-[3rem] overflow-hidden border-4 border-white/10">
+            <Image
+              src={fullScreenImage}
+              alt="Fullscreen View"
+              fill
+              className="object-contain"
+            />
+          </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+function InfoRow({ label, value, isLink, href }) {
+  return (
+    <div>
+      <p className="text-[8px] font-black text-fashion/20 uppercase tracking-[0.2em] mb-1">
+        {label}
+      </p>
+      {isLink ? (
+        <a
+          href={href}
+          className="font-sans text-sm font-bold text-rush hover:underline"
+        >
+          {value}
+        </a>
+      ) : (
+        <p className="font-display font-black text-fashion uppercase text-md">
+          {value}
+        </p>
       )}
     </div>
   );

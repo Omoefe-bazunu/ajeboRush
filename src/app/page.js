@@ -5,6 +5,7 @@ import ProductCard from "@/components/common/productcard";
 import AboutUs from "@/components/about-us";
 import CustomerReviews from "@/components/customer-reviews";
 import ContactUs from "@/components/contact-us";
+import BespokeRequestForm from "@/components/CustomOrder";
 
 // ✅ Revalidate every 60 seconds to ensure the latest "Drops" and "Menu" items are fetched
 export const revalidate = 60;
@@ -68,9 +69,9 @@ export default async function Home() {
           backgroundPosition: "center",
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-fashion/90 via-fashion/40 to-rush/30" />
+        <div className="absolute inset-0 bg-linear-to-b from-fashion/90 via-fashion/40 to-rush/30" />
         <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 text-center">
-          <h1 className="font-display text-5xl sm:text-7xl md:text-9xl font-black text-white uppercase leading-[0.9] mb-4 tracking-tighter break-words">
+          <h1 className="font-display text-5xl sm:text-7xl md:text-9xl font-black text-white uppercase leading-[0.9] mb-4 tracking-tighter wrap-break-word">
             AJEBO<span className="text-rush">RUSH</span>
           </h1>
           <p className="font-sans text-base sm:text-lg md:text-2xl text-white/90 max-w-2xl mx-auto mb-8 leading-relaxed px-2">
@@ -170,6 +171,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      <BespokeRequestForm />
 
       <CustomerReviews />
       <ContactUs />

@@ -44,7 +44,7 @@ export default function FashionClient() {
   );
 
   return (
-    <div className="min-h-screen py-32 px-6 md:px-12 bg-fashion text-white selection:bg-rush">
+    <div className="min-h-screen py-20 px-6 md:px-12 bg-fashion text-white selection:bg-rush">
       <div className="max-w-7xl mx-auto">
         {/* ART WEAR BRANDED HEADER */}
         <header className="text-center mb-8 relative">

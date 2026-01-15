@@ -9,12 +9,12 @@ export default function ProductCard({
   title,
   image,
   price,
+  fullPrice, // New prop for dual-pricing
+  halfPrice, // New prop for dual-pricing
   isDark = false,
 }) {
-  // Determine accent color based on product type
   const isCatering = type === "catering";
   const typeLabel = isCatering ? "The Menu" : "The Drop";
-  const accentColor = isCatering ? "text-rush" : "text-fashion";
 
   return (
     <Link
@@ -25,11 +25,11 @@ export default function ProductCard({
           : "bg-white border-gray-100 hover:border-rush/20"
       }`}
     >
-      {/* Image Container with Editorial Aspect Ratio */}
-      <div className="relative h-[400px] w-full overflow-hidden rounded-xl bg-gray-100">
+      {/* Image Container */}
+      <div className="relative h-100 w-full overflow-hidden rounded-xl bg-gray-100">
         {image ? (
           <Image
-            src={image} // Now it only renders if 'image' is not ""
+            src={image}
             alt={title || "AjeboRush Product"}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -40,10 +40,8 @@ export default function ProductCard({
             Image Coming Soon
           </div>
         )}
-        {/* Subtle Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-        {/* Floating Badge */}
         <div
           className={`absolute top-4 left-4 px-3 py-1 rounded-full text-[10px] font-display font-black uppercase tracking-[0.2em] shadow-sm ${
             isCatering ? "bg-white text-rush" : "bg-rush text-white"
@@ -57,7 +55,7 @@ export default function ProductCard({
       <div className="mt-5 px-1 pb-2">
         <div className="flex justify-between items-start gap-4">
           <h3
-            className={`font-display text-xl md:text-2xl font-black uppercase tracking-tighter leading-tight ${
+            className={`font-display text-xl md:text-2xl font-black uppercase tracking-tighter leading-tight flex-1 ${
               isDark ? "text-white" : "text-fashion"
             }`}
           >
@@ -65,13 +63,47 @@ export default function ProductCard({
           </h3>
 
           <div className="flex flex-col items-end">
-            <span
-              className={`font-display text-xl font-black ${
-                isDark ? "text-rush" : "text-rush"
-              }`}
-            >
-              ${price}
-            </span>
+            {/* CATERING PRICING LOGIC */}
+            {isCatering ? (
+              <div className="flex flex-col items-end">
+                {fullPrice && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[8px] font-bold uppercase tracking-widest text-fashion/40">
+                      Full
+                    </span>
+                    <span
+                      className={`font-display text-lg font-black ${
+                        isDark ? "text-white" : "text-fashion"
+                      }`}
+                    >
+                      ${fullPrice}
+                    </span>
+                  </div>
+                )}
+                {halfPrice && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[8px] font-bold uppercase tracking-widest text-rush/40">
+                      Half
+                    </span>
+                    <span className="font-display text-lg font-black text-rush">
+                      ${halfPrice}
+                    </span>
+                  </div>
+                )}
+                {/* Fallback if neither specific price is found */}
+                {!fullPrice && !halfPrice && (
+                  <span className="font-display text-xl font-black text-rush">
+                    ${price}
+                  </span>
+                )}
+              </div>
+            ) : (
+              /* FASHION PRICING LOGIC (Untouched) */
+              <span className="font-display text-xl font-black text-rush">
+                ${price}
+              </span>
+            )}
+
             <div
               className={`h-1 w-0 group-hover:w-full transition-all duration-500 bg-rush mt-1`}
             />
@@ -88,13 +120,13 @@ export default function ProductCard({
             View Item
           </span>
           <div
-            className={`h-[1px] w-0 group-hover:w-12 transition-all duration-500 bg-rush`}
+            className={`h-px w-0 group-hover:w-12 transition-all duration-500 bg-rush`}
           />
         </div>
       </div>
 
       {/* Corner "Rush" Accent */}
-      <div className="absolute bottom-0 right-0 w-0 h-0 border-b-[20px] border-r-[20px] border-transparent group-hover:border-r-rush/20 transition-all rounded-br-2xl" />
+      <div className="absolute bottom-0 right-0 w-0 h-0 border-b-20 border-r-20 border-transparent group-hover:border-r-rush/20 transition-all rounded-br-2xl" />
     </Link>
   );
 }
