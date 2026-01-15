@@ -141,7 +141,7 @@ export default function MessagesList() {
                     </span>
                   </div>
                   <p className="font-sans text-fashion/80 leading-relaxed italic">
-                    &quot{msg.message}&quot
+                    {msg.message}
                   </p>
                 </div>
 

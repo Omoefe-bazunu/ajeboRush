@@ -320,7 +320,7 @@ export default function ProductList() {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                      <div className="flex justify-end gap-2 transition-all translate-x-2 group-hover:translate-x-0">
                         <button
                           onClick={() => handleEdit(product)}
                           className="p-2.5 bg-gray-50 text-fashion border border-gray-100 rounded-xl hover:bg-fashion hover:text-white transition-all shadow-sm"

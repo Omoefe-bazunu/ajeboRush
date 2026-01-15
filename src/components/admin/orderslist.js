@@ -266,17 +266,17 @@ export default function OrdersList() {
                       <h4 className="font-display font-bold text-[10px] uppercase tracking-widest text-rush flex items-center gap-2 mb-4">
                         <Package className="w-3 h-3" /> Itemized Order
                       </h4>
-                      <div className="space-y-3">
+                      <div className="space-y-3 ">
                         {order.cartItems?.map((item, index) => (
                           <div
                             key={index}
-                            className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-2xl hover:shadow-md transition-shadow group/item"
+                            className="flex flex-col md:flex-row items-center justify-between p-5 bg-white border border-gray-100 rounded-2xl hover:shadow-md transition-shadow group/item"
                           >
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center font-display font-black text-[10px] text-fashion/20 group-hover/item:text-rush transition-colors border border-gray-100">
+                            <div className="flex items-center w-full gap-4">
+                              <div className="w-12 h-12 border-r flex items-center justify-center font-display font-black text-[10px] text-fashion/20 group-hover/item:text-rush transition-colors border-gray-100">
                                 {index + 1}
                               </div>
-                              <div>
+                              <div className=" w-full flex flex-col md:flex-row">
                                 <p className="font-display font-black text-fashion uppercase tracking-tight leading-none mb-1">
                                   {item.name}
                                 </p>
@@ -292,7 +292,7 @@ export default function OrdersList() {
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right">
+                            <div className="flex w-full flex-col mt-3 md:mt-0">
                               <p className="font-display font-black text-fashion text-lg leading-none">
                                 ${(item.quantity * item.price).toFixed(2)}
                               </p>
@@ -304,7 +304,7 @@ export default function OrdersList() {
                         ))}
                       </div>
 
-                      <div className="mt-8 p-6 bg-fashion text-white rounded-[2rem] shadow-xl flex justify-between items-center relative overflow-hidden">
+                      <div className="mt-8 p-6 bg-fashion text-white rounded-[2rem] shadow-xl flex flex-col justify-between items-center relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-5">
                           <Receipt className="w-24 h-24" />
                         </div>
@@ -321,7 +321,7 @@ export default function OrdersList() {
                             </p>
                           </div>
                         </div>
-                        <p className="font-display text-4xl font-black tracking-tighter relative z-10">
+                        <p className="font-display w-full mt-4 text-4xl font-black tracking-tighter relative z-10">
                           ${order.totalAmount?.toFixed(2)}
                         </p>
                       </div>
