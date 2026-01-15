@@ -317,7 +317,7 @@ export default function OrdersList() {
                               Settlement Total
                             </p>
                             <p className="font-sans text-xs font-medium text-white/60 uppercase tracking-tighter">
-                              Verified Payment Received
+                              Verified Payment Received.
                             </p>
                           </div>
                         </div>
