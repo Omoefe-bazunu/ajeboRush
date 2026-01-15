@@ -55,39 +55,32 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen font-sans selection:bg-rush selection:text-white">
-      {/* HERO SECTION WITH DYNAMIC GRADIENT */}
+      {/* HERO SECTION WITH TIGHTENED VERTICAL SPACE */}
       <section
-        className="relative h-screen flex items-center justify-center overflow-hidden"
+        className="relative flex flex-col justify-start overflow-hidden pt-32 pb-20 md:pt-48 md:pb-24 lg:min-h-screen"
         style={{
           backgroundImage: `url('/catering.jpg')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundAttachment: "fixed",
+          /* FIX: Removed fixed attachment on mobile as it often causes 
+       rendering issues and extra white space in some mobile browsers */
         }}
       >
-        {/* Vibrant Overlay: Fades from a dark top to a vibrant brand-red bottom tint */}
+        {/* Vibrant Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-fashion/90 via-fashion/40 to-rush/30" />
 
         <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 text-center">
-          {/* FIX: Changed text-7xl to text-5xl (or text-6xl) on mobile. 
-      Added break-all to ensure the long brand name never pushes past the screen edges.
-  */}
-          <h1 className="font-display text-5xl sm:text-7xl md:text-9xl font-black text-white uppercase leading-[0.9] mb-6 tracking-tighter break-words">
+          <h1 className="font-display text-5xl sm:text-7xl md:text-9xl font-black text-white uppercase leading-[0.9] mb-4 tracking-tighter break-words">
             AJEBO<span className="text-rush">RUSH</span>
           </h1>
 
-          {/* FIX: Adjusted text-lg to text-base on very small mobile for better fit.
-           */}
-          <p className="font-sans text-base sm:text-lg md:text-2xl text-white/90 max-w-2xl mx-auto mb-10 leading-relaxed px-2">
+          <p className="font-sans text-base sm:text-lg md:text-2xl text-white/90 max-w-2xl mx-auto mb-8 leading-relaxed px-2">
             Where <span className="font-black">Gourmet Catering</span> meets
             <span className="font-black"> Afro-Luxury Fashion</span>. Crafted
             for those who appreciate the soft life.
           </p>
 
-          {/* FIX: Buttons stack vertically on mobile and horizontally on small screens (sm:).
-      w-full on mobile ensures they are easy to tap.
-  */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6 w-full max-w-xs sm:max-w-none mx-auto">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6 w-full max-w-xs sm:max-w-none mx-auto">
             <Button
               href="/catering"
               className="w-full sm:w-auto bg-rush hover:bg-white hover:text-rush text-white px-10 py-4 rounded-full font-display font-bold uppercase tracking-widest transition-all scale-100 hover:scale-105 active:scale-95 shadow-xl"
@@ -101,11 +94,6 @@ export default async function Home() {
               Shop Fashion
             </Button>
           </div>
-        </div>
-
-        {/* Subtle Decorative Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-1 h-12 rounded-full bg-gradient-to-b from-white/50 to-transparent" />
         </div>
       </section>
 
